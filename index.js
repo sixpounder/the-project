@@ -12,7 +12,15 @@ app.use(cookieParser());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-app.use(function(req, res, next) {
+var http = require("http");
+
+function onRequest(request, response) {
+      console.log("Richiesta ricevuta dal server");
+      response.writeHead(200, {"Content-Type": "text/plain"});
+      response.write("Richiesta ricevuta");
+      response.end();
+}
+/*app.use(function(req, res, next) {
   fs.readFile('views/index.html', 'utf-8', (error, text) => {
     if (error) {
       res.status(500);
@@ -22,6 +30,6 @@ app.use(function(req, res, next) {
       res.end(text);
     }
   });
-});
+});*/
 
 app.listen(8080);
