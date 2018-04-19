@@ -1,43 +1,23 @@
+const path        = require('path');
+
 global.resolveModule = function(...args) {
   return path.resolve(__dirname, ...args);
 };
 
-const express      = require('express');
-const cookieParser = require('cookie-parser');
-const bodyParser   = require('body-parser');
-const fs           = require('fs');
-const path         = require('path');
-const logger       = require('morgan');
-const PagesController = require('./api/controllers/PagesController');
-const mainRouter   = require('./routes/main');
-const session      = require('express-session');
+const httpConfig  = require('./config/http');
+const server      = require('./server');
+const sequelize   = require('./models');
 
-const app = express();
+console.info('Starting app...');
 
-app.set('views', __dirname + '/views');
-app.set('view engine', 'pug');
+sequelize.authenticate().then(() => {
+  // DB Connection ok
 
-app.use(logger('dev'));
-app.use(express.static(path.resolve(__dirname, 'public')));
-
-app.use(cookieParser());
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
-
-app.use(session({
-  secret: '2379t4reg97o342tgfr9oi7342tgfr45',
-  saveUninitialized: true,
-  resave: false,
-  cookie: { secure: process.env.NODE_ENV === 'production' }
-}));
-
-// Routes
-app.use('/', mainRouter);
-
-app.use(PagesController.notFoundHandler);
-
-app.use(function(err, req, res, next) {
-  res.status(500).render('500', { error: err });
+  // TODO: Sincronizza il db
+  // ...
+}).then(() => {
+  return server.listen(httpConfig.port);
+}).catch(err => {
+  console.error(err);
+  process.exit(1);
 });
-
-app.listen(8080);

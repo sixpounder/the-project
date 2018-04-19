@@ -8,6 +8,8 @@ module.exports = {
   },
   
   home: function(req, res) {
-    res.render('index');
+    res.render('index', {
+      counter: req.session.homeCount
+    });
   }
 };
