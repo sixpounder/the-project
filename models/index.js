@@ -8,7 +8,11 @@ const sequelize = new Sequelize(dbConfig.database, dbConfig.username, dbConfig.p
 
 // Models definitions imports
 // Importa i due modelli qui
-sequelize.import('user', user);
-sequelize.import('clip', clip);
+const User = sequelize.import('user', user);
+const Clip = sequelize.import('clip', clip);
+
+// Setup associations
+User.hasMany(Clip, { foreignKey: 'uploaderId' });
+Clip.belongsTo(User, { foreignKey: 'uploaderId' });
 
 module.exports = sequelize;
