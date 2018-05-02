@@ -7,6 +7,9 @@ const PagesController = require(resolveModule('api/controllers/PagesController')
 const mainRouter      = require(resolveModule('routes/main'));
 const authRouter      = require(resolveModule('routes/auth'));
 const session         = require('express-session');
+const _               = require('lodash');
+
+const whitelist = ['localhost:8080', 'http://localhost:8080'];
 
 const app = express();
 
@@ -14,6 +17,20 @@ app.set('views', __dirname + '/../views');
 app.set('view engine', 'pug');
 
 app.use(logger('dev'));
+app.use(function(req, res, next) {
+  
+  res.header('Access-Control-Allow-Credentials', true);
+
+  // origin can not be '*' when crendentials are enabled. so need to set it to the request origin (if whitelisted)
+  res.header('Access-Control-Allow-Origin', _.indexOf(whitelist, req.headers.origin) !== -1 ? req.headers.origin : null);
+
+  // list of methods that are supported by the server
+  res.header('Access-Control-Allow-Methods','OPTIONS,GET,PUT,POST,DELETE');
+
+  res.header('Access-Control-Allow-Headers', 'X-Requested-With, X-HTTP-Method-Override, Content-Type, Accept');
+
+  next();
+});
 app.use(express.static(path.resolve(__dirname, 'public')));
 
 app.use(cookieParser());

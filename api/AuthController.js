@@ -21,7 +21,7 @@ module.exports = {
             return res.json({ reason: 'Something has blown up' });
           } else {
             sequelize.transaction((t) => {
-              sequelize.models.User.create({ email: data.email }, { transaction: t }).then((user) => {
+              sequelize.models.user.create({ email: data.email }, { transaction: t }).then((user) => {
                 return user.addPassport({ password: hash, provider: 'local' }, { transaction: t }).then(() => {
                   return user;
                 });

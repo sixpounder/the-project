@@ -6,15 +6,7 @@ module.exports = (sequelize, DataTypes) => {
     },
     email: {
       type: DataTypes.TEXT,
-      allowNull: true
+      allowNull: false
     }
-  }, {
-    indexes: [
-      // Create a unique index on email
-      {
-        unique: true,
-        fields: ['email']
-      }
-    ]
   });
 };

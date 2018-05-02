@@ -12,7 +12,7 @@ module.exports = function(req, res, next) {
     return res.status(406).json({ reason: 'E_NO_PASSWORD' });
   }
 
-  sequelize.models.User.findOne({ email: req.body.email }).then(result => {
+  sequelize.models.user.findOne({ email: req.body.email }).then(result => {
     if(!result) {
       return next();
     } else {
