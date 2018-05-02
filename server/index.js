@@ -5,6 +5,7 @@ const path            = require('path');
 const logger          = require('morgan');
 const PagesController = require(resolveModule('api/controllers/PagesController'));
 const mainRouter      = require(resolveModule('routes/main'));
+const authRouter      = require(resolveModule('routes/auth'));
 const session         = require('express-session');
 
 const app = express();
@@ -28,6 +29,7 @@ app.use(session({
 
 // Routes
 app.use('/', mainRouter);
+app.use('/api/auth', authRouter);
 
 app.use(PagesController.notFoundHandler);
 

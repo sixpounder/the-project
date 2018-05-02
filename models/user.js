@@ -8,5 +8,13 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.TEXT,
       allowNull: true
     }
+  }, {
+    indexes: [
+      // Create a unique index on email
+      {
+        unique: true,
+        fields: ['email']
+      }
+    ]
   });
 };
