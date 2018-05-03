@@ -6,7 +6,7 @@ const saltRounds = 10;
 
 module.exports = {
   checkEmail: (req, res) => {
-    sequelize.models.user.findOne({ email: req.query.email }).then(user => {
+    sequelize.models.user.findOne({ where: { email: req.query.email }}).then(user => {
       if(user) {
         return res.json({ exists: true });
       } else {
