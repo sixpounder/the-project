@@ -6,7 +6,7 @@ global.resolveModule = function(...args) {
 const log = require(resolveModule('lib/log'));
 
 const httpConfig  = require('./config/http');
-const server      = require('./server');
+const { server, app, socket } = require('./server');
 const sequelize   = require('./models');
 
 

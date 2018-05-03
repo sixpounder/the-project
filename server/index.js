@@ -8,10 +8,20 @@ const mainRouter      = require(resolveModule('routes/main'));
 const authRouter      = require(resolveModule('routes/auth'));
 const session         = require('express-session');
 const _               = require('lodash');
-
+const Socket          = require('socket.io');
+const http            = require('http');
+const log             = require('../lib/log');
 const whitelist = ['localhost:8080', 'http://localhost:8080'];
+const uuid = require('node-uuid');
 
 const app = express();
+const server = http.Server(app);
+const io = Socket(server);
+
+io.on('connection', (socket) => {
+  log.info('A client connected via websocket');
+  socket.emit('connected', { token: uuid.v4() });
+});
 
 app.set('views', __dirname + '/../views');
 app.set('view engine', 'pug');
@@ -54,4 +64,8 @@ app.use(function(err, req, res) {
   res.status(500).render('500', { error: err });
 });
 
-module.exports = app;
+module.exports = {
+  server: server,
+  app: app,
+  socket: io
+};
