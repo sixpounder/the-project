@@ -1,24 +1,21 @@
 module.exports = (sequelize, DataTypes) => {
   return sequelize.define('passport', {
-    identifier: {
-      type: DataTypes.TEXT,
-      allowNull: false
-    },
-
     password: {
-      type: DataTypes.TEXT,
-      allowNull: true
+      type: DataTypes.STRING,
+      allowNull: true,
     },
 
     provider: {
-      type: DataTypes.TEXT,
+      type: DataTypes.STRING,
       allowNull: false,
       defaultValue: 'local'
     },
 
     token: {
-      type: DataTypes.TEXT,
+      type: DataTypes.STRING,
       allowNull: true
     }
+  }, {
+    charset: 'utf8'
   });
 };
