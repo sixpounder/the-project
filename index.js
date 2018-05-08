@@ -14,7 +14,7 @@ log.info('Starting app...');
 
 sequelize.authenticate().then(() => {
   // DB Connection ok,k sync it
-  return sequelize.sync({ force: true });
+  return sequelize.sync();
 }).then(() => {
   return server.listen(httpConfig.port);
 }).catch(err => {

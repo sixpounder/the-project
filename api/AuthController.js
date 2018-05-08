@@ -56,5 +56,37 @@ module.exports = {
         });
       }
     });
+  },
+
+  login: (req, res) => {
+    const email = req.body.email;
+    const psw = req.body.password;
+
+    sequelize.models.user.findOne({
+      where: { email: email }, 
+      include: [{
+        model: sequelize.models.passport,
+        where: { provider: 'local' },
+        limit: 1
+      }]
+    }).then(user => {
+      if(!user) {
+        return res.status(404).json({ reason: 'E_NOTFOUND' });
+      } else {
+        const storedPassport = user.passports[0];
+        bcrypt.compare(psw, storedPassport.password, function(err, match) {
+          if (match) {
+            req.session.userId = user.id;
+            delete user.passports;
+            res.json(user);
+          } else {
+            return res.status(406).json({ reason: 'E_PSW_WRONG' });
+          }
+        });
+      }
+    }).catch(err => {
+      log.error(err);
+      res.status(500).json({ reason: 'E_GENERIC' });
+    });
   }
 };

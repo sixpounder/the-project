@@ -3,6 +3,7 @@ const cookieParser    = require('cookie-parser');
 const bodyParser      = require('body-parser');
 const path            = require('path');
 const logger          = require('morgan');
+const sessionCheck    = require(resolveModule('middlewares/sessionCheck'));
 const PagesController = require(resolveModule('api/controllers/PagesController'));
 const mainRouter      = require(resolveModule('routes/main'));
 const authRouter      = require(resolveModule('routes/auth'));
@@ -53,6 +54,8 @@ app.use(session({
   resave: false,
   cookie: { secure: process.env.NODE_ENV === 'production' }
 }));
+
+app.use(sessionCheck);
 
 // Routes
 app.use('/', mainRouter);
