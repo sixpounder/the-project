@@ -58,6 +58,14 @@ module.exports = {
     });
   },
 
+  logout: (req, res) => {
+    if (req.session.userId) {
+      req.session.userId = null;
+    }
+
+    return res.status(200).end();
+  },
+
   login: (req, res) => {
     const email = req.body.email;
     const psw = req.body.password;
@@ -88,5 +96,9 @@ module.exports = {
       log.error(err);
       res.status(500).json({ reason: 'E_GENERIC' });
     });
+  },
+
+  me: (req, res) => {
+    res.json({ user: req.user || null });
   }
 };

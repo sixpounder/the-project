@@ -7,10 +7,12 @@ const sessionCheck    = require(resolveModule('middlewares/sessionCheck'));
 const PagesController = require(resolveModule('api/controllers/PagesController'));
 const mainRouter      = require(resolveModule('routes/main'));
 const authRouter      = require(resolveModule('routes/auth'));
+const contentRouter   = require(resolveModule('routes/content'));
 const session         = require('express-session');
 const _               = require('lodash');
 const Socket          = require('socket.io');
 const http            = require('http');
+const sequelize       = require('../models');
 const log             = require('../lib/log');
 const whitelist = ['localhost:8080', 'http://localhost:8080'];
 const uuid = require('node-uuid');
@@ -22,6 +24,23 @@ const io = Socket(server);
 io.on('connection', (socket) => {
   log.info('A client connected via websocket');
   socket.emit('connected', { token: uuid.v4() });
+
+  socket.on('authenticate', (userId) => {
+    const s = this;
+    sequelize.models.user.findOne({ where: { id: userId }}).then(user => {
+      if(user) {
+        s.user = user;
+        socket.emit('authenticated');
+        log.debug(`Websocket authenticated for user ${user.email} with id ${user.id}`);
+      } else {
+        socket.emit('forbidden');
+        log.warn(`Websocket cannot authenticate user with id ${userId}`);
+      }
+    }).catch(err => {
+      log.error(err);
+      socket.emit('forbidden');
+    });
+  });
 });
 
 app.set('views', __dirname + '/../views');
@@ -60,6 +79,7 @@ app.use(sessionCheck);
 // Routes
 app.use('/', mainRouter);
 app.use('/api/auth', authRouter);
+app.use('/api/content', contentRouter);
 
 app.use(PagesController.notFoundHandler);
 
