@@ -26,7 +26,7 @@ const middleware = (req) => {
   });
 
   busboy.on('finish', () => {
-    log.debug('Finish uploading');
+    log.debug('Upload completed');
   });
 
   req.pipe(busboy);
