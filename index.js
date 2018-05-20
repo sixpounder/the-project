@@ -9,7 +9,7 @@ const log = require(resolveModule('lib/log'));
 
 const httpConfig  = require('./config/http');
 const uploadsConfig  = require('./config/uploads');
-const { server, app, socket } = require('./server');
+const { server } = require('./server');
 const sequelize   = require('./models');
 
 const ensureUploadsDir = function () {

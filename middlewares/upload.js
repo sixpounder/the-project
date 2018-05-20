@@ -4,7 +4,7 @@ const fs = require('fs');
 const conf = require('../config/uploads');
 const path = require('path');
 
-const middleware = (req) => {
+const middleware = (req, res, next) => {
   const busboy = new Busboy({ headers: req.headers });
   req.files = [];
   
@@ -25,8 +25,13 @@ const middleware = (req) => {
     });
   });
 
+  busboy.on('field', (fieldname, value) => {
+    req.body[fieldname] = value;
+  });
+
   busboy.on('finish', () => {
     log.debug('Upload completed');
+    next();
   });
 
   req.pipe(busboy);

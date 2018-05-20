@@ -1,7 +1,7 @@
 const shortid = require('shortid');
 
 module.exports = (sequelize, DataTypes) => {
-  return sequelize.define('clip', {
+  const definition = sequelize.define('clip', {
     title: {
       type: DataTypes.STRING,
       allowNull: false
@@ -34,4 +34,14 @@ module.exports = (sequelize, DataTypes) => {
       }
     }
   });
+
+  definition.prototype.toJSON = function() {
+    const values = this.get();
+
+    delete values.fd;
+
+    return values;
+  };
+
+  return definition;
 };

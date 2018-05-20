@@ -8,18 +8,24 @@ const PagesController = require(resolveModule('api/controllers/PagesController')
 const mainRouter      = require(resolveModule('routes/main'));
 const authRouter      = require(resolveModule('routes/auth'));
 const contentRouter   = require(resolveModule('routes/content'));
+const streamingRouter = require(resolveModule('routes/streaming'));
 const session         = require('express-session');
 const _               = require('lodash');
 const Socket          = require('socket.io');
 const http            = require('http');
 const sequelize       = require('../models');
 const log             = require('../lib/log');
+const { Streaming }   = require('../lib/streaming');
 const whitelist = ['localhost:8080', 'http://localhost:8080'];
 const uuid = require('node-uuid');
 
 const app = express();
 const server = http.Server(app);
-const io = Socket(server);
+const io = Socket(server, {
+  path: '/video'
+});
+
+const streamingManager = new Streaming(io);
 
 io.on('connection', (socket) => {
   log.info('A client connected via websocket');
@@ -39,6 +45,19 @@ io.on('connection', (socket) => {
     }).catch(err => {
       log.error(err);
       socket.emit('forbidden');
+    });
+  });
+
+  socket.on('join-stream-room', (room) => {
+    streamingManager.getChannel(room).then(ch => {
+      if (!ch) {
+        return streamingManager.createChannel(room);
+      } else {
+        return ch;
+      }
+    }).then(channel => {
+      socket.join(`${channel.id}`);
+      socket.emit('joined-stream-room', `${channel.id}`);
     });
   });
 });
@@ -80,6 +99,7 @@ app.use(sessionCheck);
 app.use('/', mainRouter);
 app.use('/api/auth', authRouter);
 app.use('/api/content', contentRouter);
+app.use('/api/streaming', streamingRouter);
 
 app.use(PagesController.notFoundHandler);
 

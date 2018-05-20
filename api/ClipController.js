@@ -1,4 +1,5 @@
 const sequelize = require(resolveModule('models'));
+const { Op } = require('sequelize');
 
 module.exports = {
   create: (req, res) => {
@@ -10,6 +11,19 @@ module.exports = {
       filename: fileData.filename,
       mimetype: fileData.mimetype,
       uploaderId: req.user.id
+    }).then(clip => {
+      res.json(clip);
+    });
+  },
+
+  findOne: (req, res) => {
+    sequelize.models.clip.findOne({
+      where: {
+        [ Op.or ]: [
+          {id: req.params.id},
+          {uuid: req.params.id}
+        ] 
+      }
     }).then(clip => {
       res.json(clip);
     });
