@@ -14,11 +14,13 @@ const FileStore       = require('session-file-store')(session);
 const _               = require('lodash');
 const Socket          = require('socket.io');
 const http            = require('http');
+const uuid            = require('node-uuid');
 const sequelize       = require('../models');
 const log             = require('../lib/log');
 const { Streaming }   = require('../lib/streaming');
+
 const whitelist = ['localhost:8080', 'http://localhost:8080'];
-const uuid = require('node-uuid');
+
 
 const app = express();
 const server = http.Server(app);

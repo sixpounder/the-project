@@ -10,9 +10,15 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.TEXT,
       allowNull: false
     },
+
     fd: {
       type: DataTypes.STRING,
       allowNull: false
+    },
+
+    targetFd: {
+      type: DataTypes.STRING,
+      allowNull: true
     },
 
     filename: {
@@ -35,10 +41,15 @@ module.exports = (sequelize, DataTypes) => {
     }
   });
 
+  definition.prototype.isReady = function() {
+    return this.targetFd !== null;
+  };
+
   definition.prototype.toJSON = function() {
     const values = this.get();
 
     delete values.fd;
+    delete values.convertedFd;
 
     return values;
   };

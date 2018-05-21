@@ -12,12 +12,12 @@ const uploadsConfig  = require('./config/uploads');
 const { server } = require('./server');
 const sequelize   = require('./models');
 
-const ensureUploadsDir = function () {
+const ensureDir = function (dir) {
   return new Promise((resolve, reject) => {
-    fs.access(uploadsConfig.path, fs.constants.F_OK | fs.constants.W_OK, (err) => {
+    fs.access(dir, fs.constants.F_OK | fs.constants.W_OK, (err) => {
       if (err) {
         // log.error(`${uploadsConfig.path} ${err.code === 'ENOENT' ? 'does not exist' : 'is read-only'}`);
-        fs.mkdir(uploadsConfig.path, (err) => {
+        fs.mkdir(dir, (err) => {
           if(err) {
             log.error(err);
             reject(err);
@@ -26,7 +26,7 @@ const ensureUploadsDir = function () {
           }
         });
       } else {
-        log.debug(`${uploadsConfig.path} exists, and it is writable`);
+        log.debug(`${dir.path} exists, and it is writable`);
         resolve();
       }
     });
@@ -34,9 +34,12 @@ const ensureUploadsDir = function () {
   });
 };
 
+
 log.info('Starting app...');
 
-ensureUploadsDir().then(() => {
+ensureDir(uploadsConfig.path).then(() => {
+  return ensureDir(uploadsConfig.convertedPath);
+}).then(() => {
   return sequelize.authenticate();
 }).then(() => {
   // DB Connection ok,k sync it

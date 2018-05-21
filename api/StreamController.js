@@ -58,7 +58,10 @@ module.exports = {
         }
       });
     } else {
-      sequelize.models.clip.findOne({ where: { uuid: clipUUID }, include: ['uploader']}).then((clip) => {
+      sequelize.models.clip.findOne({ where: { uuid: clipUUID }}).then((clip) => {
+        if (!clip.isReady()) {
+          res.status(202).json({ status: 'converting' });
+        }
         req.streamingManager.createChannel(clip).then(channel => {
           res.json(channel);
         }).catch(err => {
