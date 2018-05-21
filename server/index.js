@@ -10,6 +10,7 @@ const authRouter      = require(resolveModule('routes/auth'));
 const contentRouter   = require(resolveModule('routes/content'));
 const streamingRouter = require(resolveModule('routes/streaming'));
 const session         = require('express-session');
+const FileStore       = require('session-file-store')(session);
 const _               = require('lodash');
 const Socket          = require('socket.io');
 const http            = require('http');
@@ -51,13 +52,22 @@ io.on('connection', (socket) => {
   socket.on('join-stream-room', (room) => {
     streamingManager.getChannel(room).then(ch => {
       if (!ch) {
-        return streamingManager.createChannel(room);
+        socket.emit('no-stream-room', room);
+        throw 'no-stream-room';
       } else {
         return ch;
       }
     }).then(channel => {
       socket.join(`${channel.id}`);
+      channel.addStreamClient(socket);
       socket.emit('joined-stream-room', `${channel.id}`);
+      log.debug('Joined channel ' + channel.id);
+    }).catch(e => {
+      if (e === 'no-stream-room') {
+        return 'no-stream-room';
+      } else {
+        log.error(e);
+      }
     });
   });
 });
@@ -87,6 +97,7 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 app.use(session({
+  store: new FileStore(),
   secret: '2379t4reg97o342tgfr9oi7342tgfr45',
   saveUninitialized: true,
   resave: false,
@@ -94,6 +105,11 @@ app.use(session({
 }));
 
 app.use(sessionCheck);
+
+app.use((req, res, next) => {
+  req.streamingManager = streamingManager;
+  next();
+});
 
 // Routes
 app.use('/', mainRouter);

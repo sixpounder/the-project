@@ -1,5 +1,4 @@
 const sequelize = require(resolveModule('models'));
-const { Streaming } = require(resolveModule('lib/streaming'));
 const log = require('../lib/log');
 
 module.exports = {
@@ -51,7 +50,7 @@ module.exports = {
     const streamId = req.params.stream || req.query.stream;
 
     if (streamId) {
-      Streaming.getStreamChannel(req.params.stream).then(channel => {
+      req.streamingManager.getStreamChannel(req.params.stream).then(channel => {
         if (channel) {
           res.json(channel);
         } else {
@@ -60,7 +59,7 @@ module.exports = {
       });
     } else {
       sequelize.models.clip.findOne({ where: { uuid: clipUUID }, include: ['uploader']}).then((clip) => {
-        Streaming.createChannel(clip).then(channel => {
+        req.streamingManager.createChannel(clip).then(channel => {
           res.json(channel);
         }).catch(err => {
           log.error(err);
@@ -76,7 +75,7 @@ module.exports = {
   connect: (req, res) => {
     const streamIdentifier = req.params.streamIdentifier;
 
-    const channel = Streaming.getStreamChannel(streamIdentifier);
+    const channel = req.streamingManager.getStreamChannel(streamIdentifier);
 
     if (channel) {
       res.json({ channel: channel.id, currentPosition: channel.position });

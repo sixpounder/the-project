@@ -15,7 +15,7 @@ const Passport = sequelize.import('passport', passport);
 
 // Setup associations
 User.hasMany(Clip, { foreignKey: 'uploaderId' });
-Clip.belongsTo(User, { foreignKey: 'uploaderId' });
+Clip.belongsTo(User, { foreignKey: 'uploaderId', as: 'uploader' });
 
 User.hasMany(Passport);
 Passport.belongsTo(User);
