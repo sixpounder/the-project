@@ -24,7 +24,7 @@ module.exports = {
 
       // Start conversion...
       process.nextTick(function () {
-        return convert(createdClip.fd, path.resolve(conf.convertedPath, `${shortid.generate()}.webm`)).then(outputPath => {
+        return convert(createdClip.fd, path.resolve(conf.convertedPath, `${shortid.generate()}.mp4`)).then(outputPath => {
           createdClip.targetFd = outputPath;
           return createdClip.save();
         }).then(converted => {
