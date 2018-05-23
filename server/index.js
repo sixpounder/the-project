@@ -17,20 +17,21 @@ const http            = require('http');
 const uuid            = require('node-uuid');
 const sequelize       = require('../models');
 const log             = require('../lib/log');
-const { Streaming }   = require('../lib/streaming');
+const Streaming   = require('../lib/streaming');
 
 const whitelist = ['localhost:8080', 'http://localhost:8080'];
 
 
 const app = express();
 const server = http.Server(app);
-const io = Socket(server, {
-  path: '/video'
-});
+const io = Socket(server);
 
-const streamingManager = new Streaming(io);
+const videoIo = io.of('/video');
+const chatIo = io.of('/chat');
 
-io.on('connection', (socket) => {
+const streamingManager = new Streaming(videoIo, chatIo);
+
+videoIo.on('connection', (socket) => {
   log.info('A client connected via websocket');
   socket.emit('connected', { token: uuid.v4() });
 
@@ -48,28 +49,6 @@ io.on('connection', (socket) => {
     }).catch(err => {
       log.error(err);
       socket.emit('forbidden');
-    });
-  });
-
-  socket.on('join-stream-room', (room) => {
-    streamingManager.getChannel(room).then(ch => {
-      if (!ch) {
-        socket.emit('no-stream-room', room);
-        throw 'no-stream-room';
-      } else {
-        return ch;
-      }
-    }).then(channel => {
-      socket.join(`${channel.id}`);
-      channel.addStreamClient(socket);
-      socket.emit('joined-stream-room', `${channel.id}`);
-      log.debug('Joined channel ' + channel.id);
-    }).catch(e => {
-      if (e === 'no-stream-room') {
-        return 'no-stream-room';
-      } else {
-        log.error(e);
-      }
     });
   });
 });
