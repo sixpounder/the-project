@@ -14,25 +14,28 @@ module.exports = {
     sequelize.models.clip.create({
       title: metadata.title,
       fd: fileData.fd,
-      targetFd: null,
+      targetFd: fileData.mimetype === 'video/mp4' ? fileData.fd : null, // <-- If not mp4, it will need conversion
       filename: fileData.filename,
       mimetype: fileData.mimetype,
       uploaderId: req.user.id
     }).then(clip => {
       const createdClip = _.cloneDeep(clip);
-      res.json(clip);
 
-      // Start conversion...
-      process.nextTick(function () {
-        return convert(createdClip.fd, path.resolve(conf.convertedPath, `${shortid.generate()}.mp4`)).then(outputPath => {
-          createdClip.targetFd = outputPath;
-          return createdClip.save();
-        }).then(converted => {
-          log.info('Done converting clip with id ' + converted.id);
-        }).catch(err => {
-          log.error(err);
+      // Start conversion if needed...
+      if (clip.mimetype !== 'video/mp4') {
+        process.nextTick(function () {
+          return convert(createdClip.fd, path.resolve(conf.convertedPath, `${shortid.generate()}.mp4`)).then(outputPath => {
+            createdClip.targetFd = outputPath;
+            return createdClip.save();
+          }).then(converted => {
+            log.info('Done converting clip with id ' + converted.id);
+          }).catch(err => {
+            log.error(err);
+          });
         });
-      });
+      }
+
+      res.json(clip);
     });
   },
 
