@@ -21,7 +21,6 @@ const Streaming   = require('../lib/streaming');
 
 const whitelist = ['localhost:8080', 'http://localhost:8080'];
 
-
 const app = express();
 const server = http.Server(app);
 const io = Socket(server);
@@ -77,13 +76,26 @@ app.use(cookieParser());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-app.use(session({
+const sessionMiddleware = session({
   store: new FileStore(),
   secret: '2379t4reg97o342tgfr9oi7342tgfr45',
   saveUninitialized: true,
   resave: false,
   cookie: { secure: process.env.NODE_ENV === 'production' }
-}));
+});
+
+io.use(function (socket, next) {
+  socket.request.res = {};
+  sessionMiddleware(socket.request, socket.request.res, next);
+});
+
+io.use(function (socket, next) {
+  log.debug('SOCKET SESSION: ');
+  log.debug(socket.request.session);
+  next();
+});
+
+app.use(sessionMiddleware);
 
 app.use(sessionCheck);
 

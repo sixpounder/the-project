@@ -1,5 +1,6 @@
 const path = require('path');
 const fs = require('fs');
+const mkdirp = require('mkdirp');
 
 global.resolveModule = function(...args) {
   return path.resolve(__dirname, ...args);
@@ -17,16 +18,17 @@ const ensureDir = function (dir) {
     fs.access(dir, fs.constants.F_OK | fs.constants.W_OK, (err) => {
       if (err) {
         // log.error(`${uploadsConfig.path} ${err.code === 'ENOENT' ? 'does not exist' : 'is read-only'}`);
-        fs.mkdir(dir, (err) => {
+        mkdirp(dir, (err) => {
           if(err) {
             log.error(err);
             reject(err);
           } else {
+            log.info('Created directory ' + dir);
             resolve();
           }
         });
       } else {
-        log.debug(`${dir.path} exists, and it is writable`);
+        log.debug(`${dir} exists, and it is writable`);
         resolve();
       }
     });
