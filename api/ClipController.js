@@ -21,19 +21,18 @@ module.exports = {
     }).then(clip => {
       const createdClip = _.cloneDeep(clip);
 
-      // Start conversion if needed...
-      if (clip.mimetype !== 'video/mp4') {
-        process.nextTick(function () {
-          return convert(createdClip.fd, path.resolve(conf.convertedPath, `${shortid.generate()}.mp4`)).then(outputPath => {
-            createdClip.targetFd = outputPath;
-            return createdClip.save();
-          }).then(converted => {
-            log.info('Done converting clip with id ' + converted.id);
-          }).catch(err => {
-            log.error(err);
-          });
+      // Start conversion
+      process.nextTick(function () {
+        const generatedClipUUID = shortid.generate();
+        return convert(createdClip.fd, path.resolve(conf.convertedPath, generatedClipUUID, `${generatedClipUUID}.m3u8`)).then(outputPath => {
+          createdClip.targetFd = outputPath;
+          return createdClip.save();
+        }).then(converted => {
+          log.info('Done converting clip with id ' + converted.id);
+        }).catch(err => {
+          log.error(err);
         });
-      }
+      });
 
       res.json(clip);
     });

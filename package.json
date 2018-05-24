@@ -16,6 +16,7 @@
     "cookie-parser": "^1.4.3",
     "express": "^4.16.2",
     "express-session": "^1.15.6",
+    "fluent-ffmpeg": "^2.1.2",
     "lodash": "^4.17.10",
     "mkdirp": "^0.5.1",
     "morgan": "^1.9.0",
