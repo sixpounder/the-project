@@ -17,7 +17,7 @@ const http            = require('http');
 const uuid            = require('node-uuid');
 const sequelize       = require('../models');
 const log             = require('../lib/log');
-const Streaming   = require('../lib/streaming');
+// const Streaming   = require('../lib/streaming');
 
 const whitelist = ['localhost:8080', 'http://localhost:8080'];
 
@@ -28,7 +28,7 @@ const io = Socket(server);
 const videoIo = io.of('/video');
 const chatIo = io.of('/chat');
 
-const streamingManager = new Streaming(videoIo, chatIo);
+// const streamingManager = new Streaming(videoIo, chatIo);
 
 videoIo.on('connection', (socket) => {
   log.info('A client connected via websocket');
@@ -99,10 +99,10 @@ app.use(sessionMiddleware);
 
 app.use(sessionCheck);
 
-app.use((req, res, next) => {
-  req.streamingManager = streamingManager;
-  next();
-});
+// app.use((req, res, next) => {
+//   req.streamingManager = streamingManager;
+//   next();
+// });
 
 // Routes
 app.use('/', mainRouter);

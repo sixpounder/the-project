@@ -1,6 +1,7 @@
 const path = require('path');
 const fs = require('fs');
 const mkdirp = require('mkdirp');
+const cmdexists = require('command-exists');
 
 global.resolveModule = function(...args) {
   return path.resolve(__dirname, ...args);
@@ -36,11 +37,30 @@ const ensureDir = function (dir) {
   });
 };
 
+const ensureCommand = function(cmd) {
+  return new Promise((resolve, reject) => {
+    log.info('Ensuring command ' + cmd + ' exists');
+    cmdexists('ffmpeg', (err, commandExists) => {
+      if (err) {
+        reject(err);
+      } else {
+        if (commandExists) {
+          resolve(commandExists);
+        } else {
+          reject();
+        }
+      }
+    });
+  });
+};
+
 
 log.info('Starting app...');
 
 ensureDir(uploadsConfig.path).then(() => {
   return ensureDir(uploadsConfig.convertedPath);
+}).then(() => {
+  return ensureCommand('ffmpeg');
 }).then(() => {
   return sequelize.authenticate();
 }).then(() => {

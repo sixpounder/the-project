@@ -2,6 +2,7 @@ const path        = require('path');
 const { Op }      = require('sequelize');
 const shortid     = require('shortid');
 const _           = require('lodash');
+const mkdirp      = require('mkdirp');
 const sequelize   = require(resolveModule('models'));
 const convert     = require(resolveModule('lib/converter'));
 const log         = require(resolveModule('lib/log'));
@@ -13,26 +14,34 @@ module.exports = {
     const metadata = req.body;
     sequelize.models.clip.create({
       title: metadata.title,
-      fd: fileData.fd,
-      targetFd: fileData.mimetype === 'video/mp4' ? fileData.fd : null, // <-- If not mp4, it will need conversion
+      fd: fileData.fd, // <-- fd stands for "file descriptor"
+      targetFd: null, // <-- Will be converted later for HLS
       filename: fileData.filename,
       mimetype: fileData.mimetype,
       uploaderId: req.user.id
     }).then(clip => {
-      const createdClip = _.cloneDeep(clip);
+      // const createdClip = _.cloneDeep(clip);
 
       // Start conversion
-      process.nextTick(function () {
-        const generatedClipUUID = shortid.generate();
-        return convert(createdClip.fd, path.resolve(conf.convertedPath, generatedClipUUID, `${generatedClipUUID}.m3u8`)).then(outputPath => {
-          createdClip.targetFd = outputPath;
-          return createdClip.save();
-        }).then(converted => {
-          log.info('Done converting clip with id ' + converted.id);
-        }).catch(err => {
-          log.error(err);
-        });
-      });
+      // process.nextTick(function () {
+      //   const generatedClipUUID = clip.uuid;
+      //   const outdir = path.resolve(conf.convertedPath, generatedClipUUID);
+      //   mkdirp(outdir, (err) => {
+      //     if (err) {
+      //       log.error('Could not create ' + outdir);
+      //       log.error(err);
+      //     } else {
+      //       return convert(createdClip.fd, path.resolve(outdir, `${generatedClipUUID}.m3u8`)).then(outputPath => {
+      //         createdClip.targetFd = outputPath;
+      //         return createdClip.save();
+      //       }).then(converted => {
+      //         log.info('Done converting clip with id ' + converted.id);
+      //       }).catch(err => {
+      //         log.error(err);
+      //       });
+      //     }
+      //   });
+      // });
 
       res.json(clip);
     });
