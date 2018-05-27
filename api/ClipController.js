@@ -1,6 +1,6 @@
 const path        = require('path');
 const { Op }      = require('sequelize');
-const shortid     = require('shortid');
+// const shortid     = require('shortid');
 const _           = require('lodash');
 const mkdirp      = require('mkdirp');
 const sequelize   = require(resolveModule('models'));
@@ -20,28 +20,28 @@ module.exports = {
       mimetype: fileData.mimetype,
       uploaderId: req.user.id
     }).then(clip => {
-      // const createdClip = _.cloneDeep(clip);
+      const createdClip = _.cloneDeep(clip);
 
       // Start conversion
-      // process.nextTick(function () {
-      //   const generatedClipUUID = clip.uuid;
-      //   const outdir = path.resolve(conf.convertedPath, generatedClipUUID);
-      //   mkdirp(outdir, (err) => {
-      //     if (err) {
-      //       log.error('Could not create ' + outdir);
-      //       log.error(err);
-      //     } else {
-      //       return convert(createdClip.fd, path.resolve(outdir, `${generatedClipUUID}.m3u8`)).then(outputPath => {
-      //         createdClip.targetFd = outputPath;
-      //         return createdClip.save();
-      //       }).then(converted => {
-      //         log.info('Done converting clip with id ' + converted.id);
-      //       }).catch(err => {
-      //         log.error(err);
-      //       });
-      //     }
-      //   });
-      // });
+      process.nextTick(function () {
+        const generatedClipUUID = clip.uuid;
+        const outdir = path.resolve(conf.convertedPath, generatedClipUUID);
+        mkdirp(outdir, (err) => {
+          if (err) {
+            log.error('Could not create ' + outdir);
+            log.error(err);
+          } else {
+            return convert(createdClip.fd, outdir).then(outputPath => {
+              createdClip.targetFd = outputPath;
+              return createdClip.save();
+            }).then(converted => {
+              log.info('Done converting clip with id ' + converted.id);
+            }).catch(err => {
+              log.error(err);
+            });
+          }
+        });
+      });
 
       res.json(clip);
     });
