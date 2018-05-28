@@ -14,10 +14,8 @@ const FileStore       = require('session-file-store')(session);
 const _               = require('lodash');
 const Socket          = require('socket.io');
 const http            = require('http');
-const uuid            = require('node-uuid');
-const sequelize       = require('../models');
 const log             = require('../lib/log');
-// const Streaming   = require('../lib/streaming');
+const Streaming   = require('../lib/streaming');
 
 const whitelist = ['localhost:8080', 'http://localhost:8080'];
 
@@ -25,32 +23,18 @@ const app = express();
 const server = http.Server(app);
 const io = Socket(server);
 
-const videoIo = io.of('/video');
-const chatIo = io.of('/chat');
-
-// const streamingManager = new Streaming(videoIo, chatIo);
-
-videoIo.on('connection', (socket) => {
-  log.info('A client connected via websocket');
-  socket.emit('connected', { token: uuid.v4() });
-
-  socket.on('authenticate', (userId) => {
-    const s = this;
-    sequelize.models.user.findOne({ where: { id: userId }}).then(user => {
-      if(user) {
-        s.user = user;
-        socket.emit('authenticated');
-        log.debug(`Websocket authenticated for user ${user.email} with id ${user.id}`);
-      } else {
-        socket.emit('forbidden');
-        log.warn(`Websocket cannot authenticate user with id ${userId}`);
-      }
-    }).catch(err => {
-      log.error(err);
-      socket.emit('forbidden');
-    });
-  });
+io.use(function (socket, next) {
+  socket.request.res = {};
+  sessionMiddleware(socket.request, socket.request.res, next);
 });
+
+io.use(function (socket, next) {
+  log.debug('SOCKET SESSION: ');
+  log.debug(socket.request.session);
+  next();
+});
+
+const streamingManager = new Streaming(io);
 
 app.set('views', __dirname + '/../views');
 app.set('view engine', 'pug');
@@ -84,25 +68,14 @@ const sessionMiddleware = session({
   cookie: { secure: process.env.NODE_ENV === 'production' }
 });
 
-io.use(function (socket, next) {
-  socket.request.res = {};
-  sessionMiddleware(socket.request, socket.request.res, next);
-});
-
-io.use(function (socket, next) {
-  log.debug('SOCKET SESSION: ');
-  log.debug(socket.request.session);
-  next();
-});
-
 app.use(sessionMiddleware);
 
 app.use(sessionCheck);
 
-// app.use((req, res, next) => {
-//   req.streamingManager = streamingManager;
-//   next();
-// });
+app.use((req, res, next) => {
+  req.streamingManager = streamingManager;
+  next();
+});
 
 // Routes
 app.use('/', mainRouter);
