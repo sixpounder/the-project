@@ -25,13 +25,6 @@ module.exports = {
     
   },
 
-  // stream: (req, res) => {
-  //   const channel = streaming.getChannel(req.params.stream);
-  //   res.set('Content-Type', 'video/mp4');
-  //   res.status(206);
-  //   channel.addClient(res);
-  // }
-
   streamChunk: (req, res) => {
     sequelize.models.clip.findOne({ where: { uuid: req.params.id }}).then(clip => {
       if (!clip) {
@@ -50,13 +43,6 @@ module.exports = {
   },
 
   streamManifest: (req, res) => {
-    // const channel = req.query.stream;
-    // let storedChannel;
-
-    // if (channel) {
-    //   storedChannel = streaming.getChannel(channel);
-    // }
-
     sequelize.models.clip.findOne({ where: { uuid: req.params.id }}).then(clip => {
       if (!clip) {
         res.status(404).end();
@@ -64,7 +50,7 @@ module.exports = {
         res.status(202).json({ status: 'converting' });
       } else {
         // const uri = url.parse(req.url).pathname;
-        fs.readFile(clip.targetFd, (err, contents) => {
+        fs.readFile(clip.fd, (err, contents) => {
           if (err) {
             return res.status(500).json({ reason: 'E_READ' });
           }
@@ -88,5 +74,24 @@ module.exports = {
       log.error(err);
       return res.status(500).json({ reason: 'E_STREAM_GENERIC' });
     });
+  },
+  // streamManifest: (req, res) => {
+  //   try {
+  //     res.set('Content-Type', PLAYLIST_MIMETYPE).status(200).write(streaming.getChannel(req.params.id).manifest);
+  //   } catch (e) {
+  //     log.error(e);
+  //     res.status(404).end();
+  //   }
+  // },
+
+  manifestEndpoint: (req, res) => {
+    const manifestBuffer = req.files.length ? req.files[0] : null;
+
+    if (manifestBuffer) {
+      const streamId = req.params.id;
+      streaming.updateManifestForChannel(streamId);
+    } else {
+      res.status(406).end();
+    }
   }
 };

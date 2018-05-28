@@ -16,11 +16,6 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: false
     },
 
-    targetFd: {
-      type: DataTypes.STRING,
-      allowNull: true
-    },
-
     filename: {
       type: DataTypes.STRING,
       allowNull: false
@@ -42,7 +37,7 @@ module.exports = (sequelize, DataTypes) => {
   });
 
   definition.prototype.isReady = function() {
-    return this.targetFd !== null;
+    return this.fd !== null;
   };
 
   definition.prototype.toJSON = function() {
