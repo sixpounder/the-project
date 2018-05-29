@@ -4,6 +4,7 @@ const bodyParser      = require('body-parser');
 const path            = require('path');
 const logger          = require('morgan');
 const sessionCheck    = require(resolveModule('middlewares/sessionCheck'));
+const socketUser    = require(resolveModule('middlewares/socketUser'));
 const PagesController = require(resolveModule('api/controllers/PagesController'));
 const mainRouter      = require(resolveModule('routes/main'));
 const authRouter      = require(resolveModule('routes/auth'));
@@ -15,7 +16,7 @@ const _               = require('lodash');
 const Socket          = require('socket.io');
 const http            = require('http');
 const log             = require('../lib/log');
-const Streaming   = require('../lib/streaming');
+const Streaming       = require('../lib/streaming');
 
 const whitelist = ['localhost:8080', 'http://localhost:8080'];
 
@@ -28,11 +29,7 @@ io.use(function (socket, next) {
   sessionMiddleware(socket.request, socket.request.res, next);
 });
 
-io.use(function (socket, next) {
-  log.debug('SOCKET SESSION: ');
-  log.debug(socket.request.session);
-  next();
-});
+io.use(socketUser);
 
 const streamingManager = new Streaming(io);
 
