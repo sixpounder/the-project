@@ -40,7 +40,6 @@ module.exports = {
 
     chokidar.watch(manifestDir).on('add', (who) => {
       if (who === manifestPath) {
-        log.debug('***** CREATED ****** ' + who);
         fs.access(manifestPath, fs.constants.R_OK, (err) => {
           if (err) {
             log.error(err);
