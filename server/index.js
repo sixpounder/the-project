@@ -15,7 +15,6 @@ const FileStore       = require('session-file-store')(session);
 const _               = require('lodash');
 const Socket          = require('socket.io');
 const http            = require('http');
-const log             = require('../lib/log');
 const Streaming       = require('../lib/streaming');
 
 const whitelist = ['localhost:8080', 'http://localhost:8080'];
