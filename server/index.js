@@ -3,16 +3,15 @@ const cookieParser    = require('cookie-parser');
 const bodyParser      = require('body-parser');
 const path            = require('path');
 const logger          = require('morgan');
+const session         = require(resolveModule('middlewares/session'));
 const sessionCheck    = require(resolveModule('middlewares/sessionCheck'));
-const socketUser      = require(resolveModule('middlewares/socketUser'));
 const cors            = require(resolveModule('middlewares/cors'));
 const PagesController = require(resolveModule('api/controllers/PagesController'));
 const mainRouter      = require(resolveModule('routes/main'));
 const authRouter      = require(resolveModule('routes/auth'));
 const contentRouter   = require(resolveModule('routes/content'));
 const streamingRouter = require(resolveModule('routes/streaming'));
-const session         = require('express-session');
-const FileStore       = require('session-file-store')(session);
+
 const Socket          = require('socket.io');
 const http            = require('http');
 const Streaming       = require('../lib/streaming');
@@ -20,13 +19,6 @@ const Streaming       = require('../lib/streaming');
 const app = express();
 const server = http.Server(app);
 const io = Socket(server);
-
-io.use(function (socket, next) {
-  socket.request.res = {};
-  sessionMiddleware(socket.request, socket.request.res, next);
-});
-
-io.use(socketUser);
 
 const streamingManager = new Streaming(io);
 
@@ -41,15 +33,7 @@ app.use(cookieParser());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-const sessionMiddleware = session({
-  store: new FileStore(),
-  secret: '2379t4reg97o342tgfr9oi7342tgfr45',
-  saveUninitialized: true,
-  resave: false,
-  cookie: { secure: process.env.NODE_ENV === 'production' }
-});
-
-app.use(sessionMiddleware);
+app.use(session);
 
 app.use(sessionCheck);
 
