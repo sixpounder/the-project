@@ -7,13 +7,18 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: false
     },
     uuid: {
-      type: DataTypes.TEXT,
+      type: DataTypes.STRING,
       allowNull: false
     },
 
     fd: {
       type: DataTypes.STRING,
       allowNull: false
+    },
+
+    targetFd: {
+      type: DataTypes.STRING,
+      allowNull: true
     },
 
     filename: {

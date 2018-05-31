@@ -4,7 +4,10 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "db:reset": "./node_modules/.bin/sequelize db:drop && ./node_modules/.bin/sequelize db:create && ./node_modules/.bin/sequelize db:migrate",
+    "db:setup": "./node_modules/.bin/sequelize db:create && ./node_modules/.bin/sequelize db:migrate",
+    "db:migrate": "./node_modules/.bin/sequelize db:migrate"
   },
   "author": "",
   "license": "ISC",
@@ -27,6 +30,7 @@
     "pug": "^2.0.1",
     "rimraf": "^2.6.2",
     "sequelize": "^4.37.6",
+    "sequelize-cli": "^4.0.0",
     "session-file-store": "^1.2.0",
     "shortid": "^2.2.8",
     "socket.io": "^2.1.0",
