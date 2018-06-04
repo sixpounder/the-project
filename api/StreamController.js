@@ -26,7 +26,7 @@ module.exports = {
 
   streamChunk: (req, res) => {
     const filename = _.last(url.parse(req.url).pathname.split('/'));
-    const chunkPath = path.resolve(conf.convertedPath, req.params.id, req.params.stream, filename);
+    const chunkPath = path.resolve(conf.livePath, req.params.id, req.params.stream, filename);
     res.set('Content-Type', TS_MIMETYPE);
     log.info('Serving ' + chunkPath);
     const stream = fs.createReadStream(chunkPath);
@@ -35,7 +35,7 @@ module.exports = {
 
   streamManifest: (req, res) => {
     const filename = `${req.params.manifest}.m3u8`;
-    const manifestDir = path.resolve(conf.convertedPath, req.params.id, req.params.stream);
+    const manifestDir = path.resolve(conf.livePath, req.params.id, req.params.stream);
     const manifestPath = path.resolve(manifestDir, filename);
 
     chokidar.watch(manifestDir).on('add', (who) => {

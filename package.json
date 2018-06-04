@@ -23,6 +23,7 @@
     "express-session": "^1.15.6",
     "fluent-ffmpeg": "^2.1.2",
     "lodash": "^4.17.10",
+    "m3u8-parser": "^4.2.0",
     "mkdirp": "^0.5.1",
     "morgan": "^1.9.0",
     "mysql2": "^1.5.3",

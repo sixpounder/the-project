@@ -60,6 +60,8 @@ log.info('Starting app...');
 ensureDir(uploadsConfig.path).then(() => {
   return ensureDir(uploadsConfig.convertedPath);
 }).then(() => {
+  return ensureDir(uploadsConfig.livePath);
+}).then(() => {
   return ensureCommand('ffmpeg');
 }).then(() => {
   return sequelize.authenticate();
