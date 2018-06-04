@@ -6,8 +6,8 @@ const router = express.Router();
 const StreamController = require(resolveModule('api/StreamController'));
 
 router.post('/channels/:id', StreamController.create);
+router.get('/channels/:id', StreamController.findOne);
 router.get('/channels/:id/:stream/:chunk.ts', StreamController.streamChunk);
 router.get('/channels/:id/:stream/:manifest.m3u8', StreamController.streamManifest);
-// router.put('/channels/:id/:stream/manifest.m3u8', receiveManifest, StreamController.manifestEndpoint);
 
 module.exports = router;

@@ -41,8 +41,8 @@ module.exports = (sequelize, DataTypes) => {
     }
   });
 
-  definition.prototype.isReady = function() {
-    return this.fd !== null;
+  definition.prototype.isConverted = function() {
+    return this.fd !== null && this.targetFd !== null;
   };
 
   definition.prototype.toJSON = function() {

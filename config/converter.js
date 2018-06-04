@@ -1,5 +1,5 @@
 module.exports = {
-  task: 'live',    // use 'preconvert' to prebuild ts files
+  task: 'preconvert', // use 'preconvert' to prebuild ts files
   format: 'hls',   // ffmpeg -format parameter
   chunkSize: 2,    // Each .ts chunk will be of this length (in seconds)
   initTime: 5,
