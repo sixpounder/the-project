@@ -26,10 +26,10 @@ module.exports = {
   },
 
   findOne: (req, res) => {
-    sequelize.models.clip.findOne({ where: { uuid: req.params.id }}).then(clip => {
+    sequelize.models.clip.findOne({ where: { uuid: req.params.id }, include: ['uploader']}).then(clip => {
       if (clip) {
         if (clip.isConverted()) {
-          res.status(200).json({ status: 'available' });
+          res.status(200).json({ details: clip, status: 'available' });
         } else {
           res.status(202).json({ status: 'converting' });
         }
