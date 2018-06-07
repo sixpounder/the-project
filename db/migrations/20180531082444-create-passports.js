@@ -24,6 +24,21 @@ module.exports = {
       token: {
         type: DataTypes.STRING,
         allowNull: true
+      },
+
+      userId: {
+        type: DataTypes.INTEGER,
+        allowNull: true
+      },
+      
+      createdAt: {
+        allowNull: false,
+        type: DataTypes.DATE
+      },
+
+      updatedAt: {
+        allowNull: false,
+        type: DataTypes.DATE
       }
     }, {
       charset: 'utf8'

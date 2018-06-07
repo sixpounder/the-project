@@ -39,6 +39,21 @@ module.exports = {
   
       mimetype: {
         type: DataTypes.STRING
+      },
+
+      uploaderId: {
+        type: DataTypes.INTEGER,
+        allowNull: false
+      },
+
+      createdAt: {
+        allowNull: false,
+        type: DataTypes.DATE
+      },
+      
+      updatedAt: {
+        allowNull: false,
+        type: DataTypes.DATE
       }
     }, {
       charset: 'utf8'
