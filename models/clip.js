@@ -1,4 +1,5 @@
 const shortid = require('shortid');
+const path = require('path');
 
 module.exports = (sequelize, DataTypes) => {
   const definition = sequelize.define('clip', {
@@ -11,7 +12,7 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING,
       allowNull: true
     },
-    
+
     uuid: {
       type: DataTypes.STRING,
       allowNull: false
@@ -47,15 +48,30 @@ module.exports = (sequelize, DataTypes) => {
     }
   });
 
-  definition.prototype.isConverted = function() {
+  definition.prototype.isConverted = function () {
     return this.fd !== null && this.targetFd !== null;
+  };
+
+  definition.prototype.coversPath = function () {
+    if (!this.isConverted()) {
+      return null;
+    }
+    const dir = path.resolve(path.dirname(this.targetFd), 'screenshots');
+    return dir;
+  };
+
+  definition.prototype.coverPath = function (i) {
+    return path.resolve(this.coversPath(), `thumbnail-${i ? i : Math.floor(Math.random() * 3) + 1}.png`);
   };
 
   definition.prototype.toJSON = function() {
     const values = this.get();
 
+    delete values.id;
     delete values.fd;
-    delete values.convertedFd;
+    delete values.targetFd;
+
+    values.cover = `/api/content/clips/${values.uuid}/cover?i=1`;
 
     return values;
   };

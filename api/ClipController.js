@@ -1,10 +1,12 @@
 const path        = require('path');
+const fs          = require('fs');
 const { Op }      = require('sequelize');
 // const shortid     = require('shortid');
 const _           = require('lodash');
 const mkdirp      = require('mkdirp');
 const sequelize   = require(resolveModule('models'));
 const convert     = require(resolveModule('lib/converter'));
+const screenshots = require(resolveModule('lib/screenshots'));
 const log         = require(resolveModule('lib/log'));
 const conf        = require(resolveModule('config/uploads'));
 
@@ -35,6 +37,9 @@ module.exports = {
               return createdClip.save();
             }).then(converted => {
               log.info('Done converting clip with id ' + converted.id);
+              return screenshots(createdClip.fd, path.resolve(outdir, 'screenshots'));
+            }).then(() => {
+              log.info('Done generating screenshots');
             }).catch(err => {
               log.error(err);
             });
@@ -44,6 +49,47 @@ module.exports = {
 
       res.json(clip);
     });
+  },
+
+  cover: (req, res) => {
+    sequelize.models.clip.findOne({
+      where: {
+        [ Op.or ]: [
+          { id: req.params.id },
+          { uuid: req.params.id }
+        ] 
+      },
+    }).then(clip => {
+      if (!clip) {
+        res.status(404).end();
+      } else {
+        const tIndex = req.query.i || Math.floor(Math.random() * 3) + 1;
+        const rs = fs.createReadStream(path.resolve(clip.coversPath(), `thumbnail-${tIndex}.png`));
+        res.set('Content-Type', 'image/png');
+        rs.pipe(res);
+      }
+    }).catch(err => {
+      log.error(err);
+    });
+  },
+
+  find: (req, res) => {
+    const scope = req.params.scope || 'latest';
+    const page = req.query.page || 0;
+
+    if (scope === 'latest') {
+      sequelize.models.clip.findAll({
+        include: ['uploader'],
+        limit: 30,
+        offset: 30 * page,
+        order: [['createdAt', 'DESC']]
+      }).then(clips => {
+        res.json(clips);
+      }).catch(err => {
+        log.error(err);
+        res.status(500).json({ reason: 'E_SEARCH' });
+      });
+    }
   },
 
   findOne: (req, res) => {
