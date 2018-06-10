@@ -64,7 +64,7 @@ module.exports = {
         res.status(404).end();
       } else {
         const tIndex = req.query.i || Math.floor(Math.random() * 3) + 1;
-        fs.stat(path.resolve(clip.coversPath(), `thumbnail-${tIndex}.png`), (err, stats) => {
+        fs.stat(path.resolve(clip.coversPath(), `thumbnail-${tIndex}.png`), (err) => {
           res.set('Content-Type', 'image/png');
           if (err) {
             // Send a default cover
