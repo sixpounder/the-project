@@ -64,11 +64,19 @@ module.exports = {
         res.status(404).end();
       } else {
         const tIndex = req.query.i || Math.floor(Math.random() * 3) + 1;
-        const rs = fs.createReadStream(path.resolve(clip.coversPath(), `thumbnail-${tIndex}.png`));
-        res.set('Content-Type', 'image/png');
-        rs.pipe(res).on('error', (err) => {
-          log.error(err);
+        fs.stat(path.resolve(clip.coversPath(), `thumbnail-${tIndex}.png`), (err, stats) => {
+          res.set('Content-Type', 'image/png');
+          if (err) {
+            // Send a default cover
+            fs.createReadStream(path.resolve('assets', 'vph.png')).pipe(res);
+          } else {
+            const rs = fs.createReadStream(path.resolve(clip.coversPath(), `thumbnail-${tIndex}.png`));
+            rs.pipe(res).on('error', (err) => {
+              log.error(err);
+            });
+          }
         });
+        
       }
     }).catch(err => {
       log.error(err);
