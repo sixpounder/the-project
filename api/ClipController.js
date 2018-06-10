@@ -66,7 +66,9 @@ module.exports = {
         const tIndex = req.query.i || Math.floor(Math.random() * 3) + 1;
         const rs = fs.createReadStream(path.resolve(clip.coversPath(), `thumbnail-${tIndex}.png`));
         res.set('Content-Type', 'image/png');
-        rs.pipe(res);
+        rs.pipe(res).on('error', (err) => {
+          log.error(err);
+        });
       }
     }).catch(err => {
       log.error(err);
@@ -78,7 +80,7 @@ module.exports = {
     const page = req.query.page || 0;
 
     if (scope === 'latest') {
-      sequelize.models.clip.findAll({
+      sequelize.models.clip.scope('converted').findAll({
         include: ['uploader'],
         limit: 30,
         offset: 30 * page,

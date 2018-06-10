@@ -39,6 +39,14 @@ module.exports = (sequelize, DataTypes) => {
   }, {
     charset: 'utf8',
 
+    scopes: {
+      converted: {
+        where: {
+          targetFd: { [sequelize.Op.not]: null }
+        }
+      }
+    },
+
     hooks: {
       beforeValidate: (instance) => {
         if (! instance.uuid) {
