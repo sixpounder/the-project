@@ -6,6 +6,7 @@ const checkSignupDataValidity = require(resolveModule('policies/checkSignupDataV
 
 router.get('/user/check', AuthController.checkEmail);
 router.post('/login', AuthController.login);
+router.get('/logout', AuthController.logout);
 router.post('/signup', checkSignupDataValidity, AuthController.signup);
 
 router.get('/me', AuthController.me);

@@ -16,6 +16,7 @@ module.exports = {
     const metadata = req.body;
     sequelize.models.clip.create({
       title: metadata.title,
+      description: metadata.description,
       fd: fileData.fd, // <-- fd stands for "file descriptor"
       filename: fileData.filename,
       mimetype: fileData.mimetype,
