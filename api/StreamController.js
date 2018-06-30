@@ -47,8 +47,9 @@ module.exports = {
     } else {
       chunkPath = path.resolve(conf.convertedPath, req.params.id, filename);
     }
-    res.set('Content-Type', TS_MIMETYPE);
     log.info('Serving ' + chunkPath);
+    
+    res.set('Content-Type', TS_MIMETYPE);
     const stream = fs.createReadStream(chunkPath);
     stream.pipe(res);
   },

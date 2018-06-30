@@ -66,9 +66,6 @@ ensureDir(uploadsConfig.path).then(() => {
 }).then(() => {
   return sequelize.authenticate();
 }).then(() => {
-  // DB Connection ok,k sync it
-  return sequelize.sync();
-}).then(() => {
   return server.listen(httpConfig.port);
 }).catch(err => {
   log.error(err);
